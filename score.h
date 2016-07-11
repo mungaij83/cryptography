@@ -68,7 +68,7 @@ double* frequencies(char text[],char letters[]){
 char* encrypt_caesar(char text[],int key){
 	int A=(int)('A');
 	int Z=(int)('Z');
-	char *crypt=(char*)malloc(strlen(text));
+	char *crypt=(char*)malloc(strlen(text)*sizeof(char));
 	int i;
 	int index=0;
 	char c;
@@ -134,6 +134,40 @@ void print_table(Table **table){
 		printf("\n");
 	}
 }
+//Remove white space and special characters
+char *remove_ws(char *txt){
+	char *r=(char*)malloc(strlen(txt)*sizeof(char));
+	int i,idx=0;
+	for(i=0;i<strlen(txt);i++){
+		if(isalpha(txt[i])){
+			r[idx]=txt[i];
+			idx++;
+		}
+	}
+	return r;
+}
+char *remove_repetation(char*text){
+	char*more=(char*)malloc(strlen(text)*2);
+	char prev=' ';
+	int i=0,idx=0;
+	while(i<strlen(text)){
+		if(isalpha(text[i])){
+			if(prev==text[i]){
+				more[idx]='X';
+				prev='X';
+				idx++;
+			}else{
+				more[idx]=toupper(text[i]);
+				prev=text[i];
+				i++;
+				idx++;
+			}
+		}else{
+			i++;
+		}
+	}
+	return more;
+}
 char * readn(char *str,int *index, int n){
 	int i=0;
 	int nn=*index;
@@ -166,4 +200,38 @@ char **splitn(char *stri,int n){
 		free(temp);
 	}
 	return text;	
+}
+void print_vigenere(char **table,char*key){
+	int A=(int)'A';
+	int i,j,idx;
+	printf("\nKey: %s\n",key);
+	printf("\t");
+	for(i=0;i<26;i++){
+		printf("%4c",i+A);
+	}
+	printf("\n\t");
+	print_n('-',26*4);
+	for(i=0;i<strlen(key);i++){
+		idx=toupper(key[i])-A;
+		printf("%3d%3c |",idx,toupper(key[i]));
+		for(j=0;j<26;j++){
+			printf("%4c",table[idx][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+char **vigenere_table(char *alpha,char*key){
+	int len=strlen(key);
+	char **table=(char**)malloc(len*sizeof(char*));
+	int i,index;
+	int A=(int)'A';
+	//Produce table for only characters in the key, we dont need the rest
+	for(i=0;i<len;i++){
+		index=toupper(key[i])-A;
+		table[index]=encrypt_caesar(alpha,index);
+		//strncpy(table[index],tmp,26);
+		printf("%d=>%s\n",index,table[index]);
+	}
+	return table;
 }
